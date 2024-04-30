@@ -1,7 +1,11 @@
 import { BackupMethod } from './types'
 
 // Utility function to notify Portal about storing the client backup share
-const notifyPortalAboutBackupShare = async (backupMethod: string, success: boolean) => {
+const notifyPortalAboutBackupShare = async (
+  backupMethod: string,
+  success: boolean,
+  clientAPIKey: string,
+) => {
   try {
     const portalUrl = 'https://api.portalhq.io/api/v1/clients/me/wallet/stored-client-backup-share'
     const portalRequestBody = {
@@ -12,7 +16,7 @@ const notifyPortalAboutBackupShare = async (backupMethod: string, success: boole
     const portalResponse = await fetch(portalUrl, {
       method: 'PUT',
       headers: {
-        Authorization: `Bearer ${process.env.PORTAL_API_KEY}`,
+        Authorization: `Bearer ${clientAPIKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(portalRequestBody),

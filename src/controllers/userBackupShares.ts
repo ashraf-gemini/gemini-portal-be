@@ -4,6 +4,8 @@ import { Request, Response } from 'express'
 import { UserBackupShareModel } from '../db/userBackupShares'
 import { UserModel } from '../db/users'
 import notifyPortalAboutBackupShare, { isValidBackupMethod } from '../utils'
+import { WalletClientModel } from '../db/walletClients'
+import mongoose from 'mongoose'
 
 // Controller to create user backup shares
 export const createUserBackupShare = async (req: Request, res: Response) => {
@@ -12,12 +14,23 @@ export const createUserBackupShare = async (req: Request, res: Response) => {
 
   try {
     // Check if the user associated with the walletClientId exists
-    const user = await UserModel.findOne({ walletClients: { $in: [walletClientId] } })
+    // Convert walletClientId to ObjectId
+    const walletClient = await WalletClientModel.findOne({ id: walletClientId })
+
+    const walletClientIdObject = new mongoose.Types.ObjectId(walletClient._id)
+
+    // Find user with matching walletClientId in walletClients array
+    const user = await UserModel.findOne({ walletClients: { $in: [walletClientIdObject] } })
+
     if (!user) {
       return res.status(404).json({ error: 'User not found' })
     } // Check if the backup method is valid
     if (!isValidBackupMethod(backupMethod)) {
       return res.status(400).json({ error: 'Invalid backup method' })
+    }
+
+    if (!walletClient) {
+      return res.status(404).json({ error: 'Wallet client not found' })
     }
 
     // Create a new user backup share document
@@ -29,7 +42,12 @@ export const createUserBackupShare = async (req: Request, res: Response) => {
 
     // Save the new user backup share to the database
     const savedUserBackupShare = await newUserBackupShare.save()
-    const portalNotificationSuccessful = await notifyPortalAboutBackupShare(backupMethod, true)
+    const portalNotificationSuccessful = await notifyPortalAboutBackupShare(
+      backupMethod,
+      true,
+      walletClient.clientApiKey,
+    )
+
     if (!portalNotificationSuccessful) {
       throw new Error('Failed to notify Portal about storing client backup share')
     }
@@ -47,8 +65,13 @@ export const getUserBackupShares = async (req: Request, res: Response) => {
   const { walletClientId } = req.params
 
   try {
-    // Check if the user associated with the walletClientId exists
-    const user = await UserModel.findOne({ walletClients: { $in: [walletClientId] } })
+    const walletClient = await WalletClientModel.findOne({ id: walletClientId })
+
+    const walletClientIdObject = new mongoose.Types.ObjectId(walletClient._id)
+
+    // Find user with matching walletClientId in walletClients array
+    const user = await UserModel.findOne({ walletClients: { $in: [walletClientIdObject] } })
+
     if (!user) {
       return res.status(404).json({ error: 'User not found' })
     }
