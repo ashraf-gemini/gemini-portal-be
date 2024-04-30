@@ -9,8 +9,8 @@ import {
 } from '../controllers/walletClients'
 
 export default (router: express.Router) => {
-  router.post('/users/:userId/wallet-clients', createWalletClient)
+  router.post('/wallet-client', createWalletClient)
   router.get('/wallet-clients/:clientId', getWalletClientById)
-  router.get('/users/:userId/wallet-clients', getWalletClients)
+  router.get('/wallet-clients/user/:userId', getWalletClients)
   router.post('/wallet-clients/:clientId/session', refreshClientSessionToken)
 }

@@ -3,6 +3,7 @@
 import { Request, Response } from 'express'
 import { WalletClientModel } from '../db/walletClients'
 import { UserModel } from '../db/users'
+import { fetchClientDetails } from '../utils'
 
 interface ClientResponse {
   id: string
@@ -12,13 +13,19 @@ interface ClientResponse {
 }
 
 export const createWalletClient = async (req: Request, res: Response) => {
-  const { userId } = req.params
+  const { userId, walletName, ...body } = req.body
   try {
     const user = await UserModel.findOne({ id: userId })
     if (!user) {
       return res.status(404).json({ error: 'User not found' })
     }
+    // Check if a wallet with the same name already exists for the user
+    const existingWallet = await WalletClientModel.findOne({ userId, walletName })
+    if (existingWallet) {
+      return res.status(400).json({ error: 'Wallet name already exists' })
+    }
 
+    // Make the initial API call to create the wallet client
     const response = await fetch('https://api.portalhq.io/api/v1/custodians/clients', {
       method: 'POST',
       headers: {
@@ -32,14 +39,28 @@ export const createWalletClient = async (req: Request, res: Response) => {
       throw new Error('Failed to create wallet client')
     }
 
-    const responseData: ClientResponse = await response.json()
+    // Parse the response data
+    const responseData = await response.json()
 
-    const newClient = new WalletClientModel({ ...responseData, userId })
+    // Fetch additional details from PORTAL for completeness
+    const clientDetails = await fetchClientDetails(responseData.id)
+
+    // Create a new WalletClientModel instance with the additional details
+    const newClient = new WalletClientModel({
+      ...responseData,
+      userId,
+      ...clientDetails,
+      walletName,
+    })
+
+    // Save the new client to the database
     await newClient.save()
 
+    // Update the user's walletClients array with the new client's ID
     user.walletClients.push(newClient._id)
     await user.save()
 
+    // Respond with the newly created client
     res.status(201).json(newClient)
   } catch (error) {
     console.error(error)
@@ -74,6 +95,7 @@ export const getWalletClientById = async (req: Request, res: Response) => {
 export const getWalletClients = async (req: Request, res: Response) => {
   try {
     const user = await UserModel.findOne({ id: req.params.userId }).populate('walletClients')
+    console.log('🚀 ~ getWalletClients ~ user:', user)
     if (!user) {
       return res.status(404).json({ error: 'User not found' })
     }

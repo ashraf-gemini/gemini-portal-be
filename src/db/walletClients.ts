@@ -23,6 +23,12 @@ const walletClientSchema = new mongoose.Schema({
   userId: {
     type: String,
   },
+  isAccountAbstracted: {
+    type: Boolean,
+  },
+  walletName: {
+    type: String,
+  },
 })
 
 export const WalletClientModel = mongoose.model(SCHEMA_NAMES.WALLET_CLIENT, walletClientSchema)
