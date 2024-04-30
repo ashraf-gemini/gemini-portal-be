@@ -13,7 +13,7 @@ interface ClientResponse {
 }
 
 export const createWalletClient = async (req: Request, res: Response) => {
-  const { userId, walletName, ...body } = req.body
+  const { userId, walletName } = req.body
   try {
     const user = await UserModel.findOne({ id: userId })
     if (!user) {
