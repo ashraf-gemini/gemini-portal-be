@@ -7,7 +7,8 @@
     "start": "nodemon",
     "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "build": "echo Building Functions"
   },
   "keywords": [],
   "author": "",
@@ -25,12 +26,14 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@netlify/functions": "^2.6.0",
     "body-parser": "^1.20.2",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "mongoose": "^8.3.2"
+    "mongoose": "^8.3.2",
+    "serverless-http": "^3.2.0"
   }
 }

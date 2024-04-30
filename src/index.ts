@@ -38,3 +38,4 @@ mongoose.connection.on('error', (error) => {
 })
 
 app.use('/', router())
+export default app
