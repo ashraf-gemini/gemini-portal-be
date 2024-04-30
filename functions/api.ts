@@ -9,3 +9,5 @@ module.exports.handler = async (event, context) => {
   const result = await handler(event, context)
   return result
 }
+
+//https://answers.netlify.com/t/making-mongoose-work-with-express/72703/3
