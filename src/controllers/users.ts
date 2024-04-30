@@ -16,6 +16,7 @@ export const getUserById = async (req: e.Request, res: e.Response) => {
   const userId = req.params.userId // Extract userId from request parameters
   try {
     const user = await UserModel.findById(userId) // Find user by userId
+
     if (!user) {
       // If user is not found, return 404 status with error message
       return res.status(404).json({ message: 'User not found' })

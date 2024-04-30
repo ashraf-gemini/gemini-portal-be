@@ -1,8 +1,6 @@
-[functions]
-  external_node_modules = ["express"]
-  node_bundler = "esbuild"
+[build]
+        functions="functions"
 [[redirects]]
-  force = true
-  from = "/*"
-  status = 200
-  to = "/.netlify/functions/api/:splat"
+    from = "/*"
+    to = "/.netlify/functions/api/:splat"
+    status = 200

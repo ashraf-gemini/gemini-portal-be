@@ -30,12 +30,17 @@ server.listen(port, () => {
 
 const MONGO_URL = process.env.DATABASE_URL
 
-mongoose.Promise = Promise
-mongoose.connect(MONGO_URL)
-mongoose.connection.on('error', (error) => {
+export const mongooseInstance = mongoose
+mongooseInstance.Promise = Promise
+mongooseInstance.connect(MONGO_URL)
+mongooseInstance.connection.on('error', (error) => {
   console.log('MongoDB Connection Error: ', error)
   process.exit()
 })
+mongooseInstance.connection.on('connected', () => {
+  console.log('MongoDB is connected')
+})
 
 app.use('/', router())
+
 export default app
