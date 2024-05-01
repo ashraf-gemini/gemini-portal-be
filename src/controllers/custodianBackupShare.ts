@@ -15,14 +15,13 @@ export const handleBackupWebhook = async (req: Request, res: Response) => {
     // Extract data from the request body
     const { backupMethod, clientId, share } = req.body
 
-    if (isValidBackupMethod(backupMethod)) {
+    if (!isValidBackupMethod(backupMethod)) {
       return res.status(400).json({ error: 'Invalid backup method' })
     }
 
     // Validate share (Assuming it's a JSON string)
-    let parsedShare
     try {
-      parsedShare = JSON.parse(share)
+      JSON.parse(share)
     } catch (error) {
       return res.status(400).json({ error: 'Invalid share format' })
     }
@@ -31,12 +30,14 @@ export const handleBackupWebhook = async (req: Request, res: Response) => {
     const newBackupShare = new CustodianBackupShareModel({
       backupMethod,
       walletClientId: clientId,
-      share: parsedShare,
+      share,
     })
     await newBackupShare.save()
 
     // Return 200 status code
-    return res.status(200).send()
+    return res.status(200).send({
+      message: 'Backup share stored successfully',
+    })
   } catch (error) {
     console.error(error)
     return res.status(500).json({ error: 'Internal server error' })
