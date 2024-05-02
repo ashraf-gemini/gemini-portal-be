@@ -13,8 +13,14 @@ interface ClientResponse {
 }
 
 export const createWalletClient = async (req: Request, res: Response) => {
-  const { userId, walletName } = req.body
+  const { userId, walletName, isAccountAbstracted } = req.body
   try {
+    // Check if any required fields are missing
+    const requiredFields = ['userId', 'walletName', 'isAccountAbstracted']
+    const missingFields = requiredFields.filter((field) => !Object.keys(req.body).includes(field))
+    if (missingFields.length > 0) {
+      return res.status(400).json({ error: `Missing required fields: ${missingFields.join(', ')}` })
+    }
     const user = await UserModel.findOne({ id: userId })
     if (!user) {
       return res.status(404).json({ error: 'User not found' })
@@ -51,6 +57,7 @@ export const createWalletClient = async (req: Request, res: Response) => {
       userId,
       ...clientDetails,
       walletName,
+      isAccountAbstracted,
     })
 
     // Save the new client to the database
