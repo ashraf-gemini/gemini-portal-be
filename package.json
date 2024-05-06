@@ -8,6 +8,7 @@
     "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write .",
+    "prebuild": "npm install --save-dev netlify-cli",
     "build": "netlify deploy --prod"
   },
   "keywords": [],
