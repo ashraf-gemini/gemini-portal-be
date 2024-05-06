@@ -13,7 +13,7 @@ interface ClientResponse {
 }
 
 export const createWalletClient = async (req: Request, res: Response) => {
-  const { userId, walletName, isAccountAbstracted } = req.body
+  const { userId, walletName, isAccountAbstracted, userName } = req.body
   try {
     // Check if any required fields are missing
     const requiredFields = ['userId', 'walletName', 'isAccountAbstracted']
@@ -23,7 +23,14 @@ export const createWalletClient = async (req: Request, res: Response) => {
     }
     const user = await UserModel.findOne({ id: userId })
     if (!user) {
-      return res.status(404).json({ error: 'User not found' })
+      // Create a new user document
+      const newUser = new UserModel({
+        id: userId,
+        name: userName,
+      })
+
+      // Save the new user document to the database
+      await newUser.save()
     }
     // Check if a wallet with the same name already exists for the user
     const existingWallet = await WalletClientModel.findOne({ userId, walletName })
