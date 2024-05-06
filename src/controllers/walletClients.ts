@@ -16,22 +16,28 @@ export const createWalletClient = async (req: Request, res: Response) => {
   const { userId, walletName, isAccountAbstracted, userName } = req.body
   try {
     // Check if any required fields are missing
-    const requiredFields = ['userId', 'walletName', 'isAccountAbstracted']
+    const requiredFields = ['userId', 'walletName', 'isAccountAbstracted', 'userName']
     const missingFields = requiredFields.filter((field) => !Object.keys(req.body).includes(field))
     if (missingFields.length > 0) {
       return res.status(400).json({ error: `Missing required fields: ${missingFields.join(', ')}` })
     }
-    const user = await UserModel.findOne({ id: userId })
-    if (!user) {
-      // Create a new user document
-      const newUser = new UserModel({
-        id: userId,
-        name: userName,
-      })
+    let user = await UserModel.findOne({ id: userId })
+    try {
+      if (!user) {
+        // Create a new user document
+        const newUser = new UserModel({
+          id: userId,
+          name: userName,
+        })
 
-      // Save the new user document to the database
-      await newUser.save()
+        // Save the new user document to the database
+        await newUser.save()
+      }
+    } catch (error) {
+      return res.status(400).json({ error: 'Error creating a new user!' })
     }
+    user = await UserModel.findOne({ id: userId })
+
     // Check if a wallet with the same name already exists for the user
     const existingWallet = await WalletClientModel.findOne({ userId, walletName })
     if (existingWallet) {
