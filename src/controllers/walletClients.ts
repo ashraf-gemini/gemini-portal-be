@@ -181,11 +181,9 @@ export const updateWalletClient = async (req: Request, res: Response) => {
     if (!walletClient) {
       return res.status(404).json({ error: 'Wallet client not found' })
     }
-    console.log('sdfs')
 
     // Loop over the request body and update the wallet client with the new values
     Object.keys(req.body).forEach((field) => {
-      console.log('🚀 ~ Object.keys ~ field:', field)
       supportedFields.includes(field)
       if (supportedFields.includes(field)) {
         ;(walletClient as any)[field] = req.body[field]
