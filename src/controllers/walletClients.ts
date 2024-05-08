@@ -16,7 +16,7 @@ export const createWalletClient = async (req: Request, res: Response) => {
   const { userId, walletName, isAccountAbstracted, userName } = req.body
   try {
     // Check if any required fields are missing
-    const requiredFields = ['userId', 'walletName', 'isAccountAbstracted', 'userName']
+    const requiredFields = ['userId', 'walletName', 'isAccountAbstracted']
     const missingFields = requiredFields.filter((field) => !Object.keys(req.body).includes(field))
     if (missingFields.length > 0) {
       return res.status(400).json({ error: `Missing required fields: ${missingFields.join(', ')}` })
@@ -25,10 +25,14 @@ export const createWalletClient = async (req: Request, res: Response) => {
     try {
       if (!user) {
         // Create a new user document
-        const newUser = new UserModel({
-          id: userId,
-          name: userName,
-        })
+        const newUser = new UserModel(
+          JSON.parse(
+            JSON.stringify({
+              id: userId,
+              name: userName,
+            }),
+          ),
+        )
 
         // Save the new user document to the database
         await newUser.save()
