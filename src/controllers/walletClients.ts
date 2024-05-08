@@ -150,3 +150,51 @@ export const refreshClientSessionToken = async (req: Request, res: Response) => 
     res.status(500).json({ error: 'Internal server error' })
   }
 }
+
+export const updateWalletClient = async (req: Request, res: Response) => {
+  const { clientId } = req.params
+
+  try {
+    // Check if any unsupported fields are provided
+    const supportedFields = [
+      'walletName',
+      'isAccountAbstracted',
+      'address',
+      'backupStatus',
+      'signingStatus',
+    ]
+    const unsupportedFields = Object.keys(req.body).filter(
+      (field) => !supportedFields.includes(field),
+    )
+    if (unsupportedFields.length > 0) {
+      return res
+        .status(400)
+        .json({ error: `Unsupported fields provided: ${unsupportedFields.join(', ')}` })
+    }
+
+    // Find the wallet client by ID
+    const walletClient = await WalletClientModel.findOne({ id: clientId })
+    if (!walletClient) {
+      return res.status(404).json({ error: 'Wallet client not found' })
+    }
+    console.log('sdfs')
+
+    // Loop over the request body and update the wallet client with the new values
+    Object.keys(req.body).forEach((field) => {
+      console.log('🚀 ~ Object.keys ~ field:', field)
+      supportedFields.includes(field)
+      if (supportedFields.includes(field)) {
+        ;(walletClient as any)[field] = req.body[field]
+      }
+    })
+
+    // Save the updated wallet client to the database
+    await walletClient.save()
+
+    // Respond with the updated wallet client
+    res.status(200).json(walletClient)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+}
