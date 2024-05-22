@@ -3,4 +3,5 @@ export const SCHEMA_NAMES = {
   USER: 'User',
   USER_BACKUP_SHARE: 'UserBackupShare',
   CUSTODIAN_BACKUP_SHARE: 'CustodianBackupShare',
+  TOKEN_METADATA: 'TokenMetadata',
 }

@@ -61,3 +61,30 @@ export const fetchClientDetails = async (clientId: string) => {
 export const isValidBackupMethod = (method: string): method is BackupMethod => {
   return ['ICLOUD', 'GDRIVE', 'PASSKEY', 'PASSWORD'].includes(method)
 }
+
+// Helper function to fetch token metadata
+export const fetchTokenMetadata = async (network: string, contractAddress: string) => {
+  const url = `https://${network}.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`
+  const payload = {
+    id: 1,
+    jsonrpc: '2.0',
+    method: 'alchemy_getTokenMetadata',
+    params: [contractAddress],
+  }
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch token metadata')
+  }
+
+  const data = await response.json()
+  return data.result
+}
