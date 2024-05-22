@@ -25,7 +25,7 @@ export const getAssetTransfers = async (req: Request, res: Response) => {
   const toPayload = { ...defaultData, params: [{ ...params, toAddress: address }] }
   const fromPayload = { ...defaultData, params: [{ ...params, fromAddress: address }] }
 
-  const url = `https://${network}.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`
+  const url = `https://${network}.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
 
   try {
     const [incomingResponse, outgoingResponse] = await Promise.all([
@@ -60,6 +60,41 @@ export const getAssetTransfers = async (req: Request, res: Response) => {
     res.status(200).json([...incomingTransfers, ...outgoingTransfers])
   } catch (error) {
     console.error('Error fetching asset transfers:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+}
+// Handler to get token metadata
+export const getTokenMetadata = async (req: Request, res: Response) => {
+  const { network, contractAddress } = req.params
+
+  const payload = {
+    id: 1,
+    jsonrpc: '2.0',
+    method: 'alchemy_getTokenMetadata',
+    params: [contractAddress],
+  }
+
+  const url = `https://${network}.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch token metadata')
+    }
+
+    const data = await response.json()
+
+    res.status(200).json(data.result)
+  } catch (error) {
+    console.error('Error fetching token metadata:', error)
     res.status(500).json({ error: 'Internal server error' })
   }
 }
