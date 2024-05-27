@@ -12,7 +12,7 @@ export const getAssetTransfers = async (req: Request, res: Response) => {
   const params = {
     fromBlock: '0x0',
     toBlock: 'latest',
-    withMetadata: false,
+    withMetadata: true,
     excludeZeroValue: false,
     maxCount: '0x3e8',
     category: ['external', 'internal', 'erc20', 'erc721', 'erc1155'],
