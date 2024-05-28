@@ -4,6 +4,7 @@ import alchemyRouter from './alchemy'
 import walletClientsRouter from './walletClients'
 import userBackupSharesRouter from './userBackupShares'
 import custodianBackupShareRouter from './custodianBackupShare'
+import zeroXRouter from './0x'
 const router = express.Router()
 
 export default (): express.Router => {
@@ -12,5 +13,6 @@ export default (): express.Router => {
   userBackupSharesRouter(router)
   custodianBackupShareRouter(router)
   alchemyRouter(router)
+  zeroXRouter(router)
   return router
 }
