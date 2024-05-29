@@ -8,13 +8,8 @@ const ZEROX_API_KEY = process.env.ZEROX_API_KEY
 export const getSwapPrice = async (req: Request, res: Response) => {
   const { network, ...rest } = req.query
 
-  if (!network) {
-    res.status(400).json({ error: 'Missing network query parameter' })
-    return
-  }
-
   const params = qs.stringify({ ...rest } as qs.ParsedUrlQueryInput)
-  const url = `https://${network}.api.0x.org/swap/v1/price?${params}`
+  const url = `https://${network ? `${network}.` : ''}api.0x.org/swap/v1/price?${params}`
 
   try {
     const response = await fetch(url, {
@@ -23,14 +18,10 @@ export const getSwapPrice = async (req: Request, res: Response) => {
       },
     })
 
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch swap price. Status: ${response.status} ${response.statusText}`,
-      )
-    }
-
     const data = await response.json()
-
+    if (!response.ok) {
+      return res.status(res.statusCode).json(data)
+    }
     res.status(200).json(data)
   } catch (error) {
     console.error('Error fetching swap price:', error)
@@ -42,13 +33,8 @@ export const getSwapPrice = async (req: Request, res: Response) => {
 export const getSwapQuote = async (req: Request, res: Response) => {
   const { network, ...rest } = req.query
 
-  if (!network) {
-    res.status(400).json({ error: 'Missing network query parameter' })
-    return
-  }
-
   const params = qs.stringify({ ...rest } as qs.ParsedUrlQueryInput)
-  const url = `https://${network}.api.0x.org/swap/v1/quote?${params}`
+  const url = `https://${network ? `${network}.` : ''}api.0x.org/swap/v1/quote?${params}`
 
   try {
     const response = await fetch(url, {
@@ -57,13 +43,10 @@ export const getSwapQuote = async (req: Request, res: Response) => {
       },
     })
 
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch swap quote. Status: ${response.status} ${response.statusText}`,
-      )
-    }
-
     const data = await response.json()
+    if (!response.ok) {
+      return res.status(res.statusCode).json(data)
+    }
 
     res.status(200).json(data)
   } catch (error) {
