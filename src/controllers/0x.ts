@@ -19,10 +19,12 @@ export const getSwapPrice = async (req: Request, res: Response) => {
     })
 
     const data = await response.json()
+
     if (!response.ok) {
-      return res.status(res.statusCode).json(data)
+      return res.status(response.status).json(data)
+    } else {
+      res.status(200).json(data)
     }
-    res.status(200).json(data)
   } catch (error) {
     console.error('Error fetching swap price:', error)
     res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' })
@@ -45,7 +47,7 @@ export const getSwapQuote = async (req: Request, res: Response) => {
 
     const data = await response.json()
     if (!response.ok) {
-      return res.status(res.statusCode).json(data)
+      return res.status(response.status).json(data)
     }
 
     res.status(200).json(data)
