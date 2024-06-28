@@ -6,6 +6,7 @@ import userBackupSharesRouter from './userBackupShares'
 import custodianBackupShareRouter from './custodianBackupShare'
 import zeroXRouter from './0x'
 import infuraRouter from './infura'
+import apiKeysRouter from './apiKeys'
 const router = express.Router()
 
 export default (): express.Router => {
@@ -16,5 +17,6 @@ export default (): express.Router => {
   alchemyRouter(router)
   zeroXRouter(router)
   infuraRouter(router)
+  apiKeysRouter(router)
   return router
 }
